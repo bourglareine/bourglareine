@@ -9,7 +9,7 @@ public class Player : MonoBehaviour {
 	public Transform groundCheck;
 	float groundRadius =0.2f;
 	public LayerMask whatIsGround;
-	public float jumpForce =500;
+	public float jumpForce =700;
 	bool doubleJump = false;
 
 	Animator anim;
@@ -25,7 +25,7 @@ public class Player : MonoBehaviour {
 		if ((grounded || !doubleJump) && Input.GetKeyDown (KeyCode.Space)) 
 		{
 			anim.SetBool ("ground",false);
-			rigidbody2D.AddForce (new Vector2(0,doubleJump?jumpForce/2:jumpForce),ForceMode2D.Impulse);
+			rigidbody2D.AddForce (new Vector2(0,!grounded?jumpForce/2:jumpForce),ForceMode2D.Impulse);
 
 			if (!doubleJump && !grounded)
 			{doubleJump=true;}
