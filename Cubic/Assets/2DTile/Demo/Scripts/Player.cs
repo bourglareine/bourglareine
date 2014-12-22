@@ -49,6 +49,7 @@ public class Player : MonoBehaviour {
 
 		anim.SetFloat("speed", Mathf.Abs(move));
 		// "Opérateur ternaire"(cf.google pour le terme):a partie du code : doubleJumpe?0.4f:1) est équivalente à : if(doubleJump){valeur=0.4}else{valeur=1} et valeur est injectée directement dans le code 
+
 			rigidbody2D.velocity = new Vector2 (move * maxSpeed*(doubleJump?0.4f:1), rigidbody2D.velocity.y);
 
 		if (move > 0 && !facingRight) 

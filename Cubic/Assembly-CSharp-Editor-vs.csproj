@@ -51,7 +51,7 @@
      <Compile Include="Assets\2DTile\Scripts\Editor\TilePrefabEditor.cs" />
      <None Include="Assets\2DTile\Shaders\2DTile.shader" />
  <Reference Include="Assembly-UnityScript-firstpass">
- <HintPath>C:/Users/nabil/Documents/SourceForge/bourglareine/Cubic/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
+ <HintPath>C:/Users/nabil/Documents/GitHub/bourglareine/Cubic/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.Graphs">
  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.Graphs.dll</HintPath>
