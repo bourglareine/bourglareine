@@ -22,7 +22,7 @@ public class Player : MonoBehaviour {
 
 	void Update()
 	{
-		if ((grounded || !doubleJump) && Input.GetKeyDown (KeyCode.Space)) 
+		if ((grounded || !doubleJump) && (Input.GetKeyDown (KeyCode.Space)|| Input.GetKeyDown(KeyCode.JoystickButton0))) 
 		{
 			anim.SetBool ("ground",false);
 			rigidbody2D.AddForce (new Vector2(0,!grounded?jumpForce/2:jumpForce),ForceMode2D.Impulse);
