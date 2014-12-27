@@ -25,6 +25,7 @@ public class Player : MonoBehaviour {
 		if ((grounded || !doubleJump) && (Input.GetKeyDown (KeyCode.Space)|| Input.GetKeyDown(KeyCode.JoystickButton0))) 
 		{
 			anim.SetBool ("ground",false);
+            rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, 0);
 			rigidbody2D.AddForce (new Vector2(0,!grounded?jumpForce/2:jumpForce),ForceMode2D.Impulse);
 
 			if (!doubleJump && !grounded)
