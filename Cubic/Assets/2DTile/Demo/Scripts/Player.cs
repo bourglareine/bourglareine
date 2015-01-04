@@ -5,12 +5,20 @@ public class Player : MonoBehaviour {
 
 	public float maxSpeed=20f;
 	bool facingRight = true;
-	bool grounded=false;
-	public Transform groundCheck;
-	float groundRadius =0.2f;
-	public LayerMask whatIsGround;
 	public float jumpForce =700;
 	bool doubleJump = false;
+
+	public Transform groundCheck;
+	public LayerMask whatIsGround;
+	bool grounded=false;
+	float groundRadius =0.2f;
+	
+	public Transform wallCheck;
+	public LayerMask whatIsWall;
+	bool walled=false;
+	bool ancientwalled;
+	float wallRadius =0.52f;
+
 
 	Animator anim;
 
@@ -25,8 +33,9 @@ public class Player : MonoBehaviour {
 		if ((grounded || !doubleJump) && (Input.GetKeyDown (KeyCode.Space)|| Input.GetKeyDown(KeyCode.JoystickButton0))) 
 		{
 			anim.SetBool ("ground",false);
+
             rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, 0);
-			rigidbody2D.AddForce (new Vector2(0,!grounded?jumpForce/2:jumpForce),ForceMode2D.Impulse);
+			rigidbody2D.AddForce (new Vector2(0,!grounded?jumpForce/1.5f:jumpForce),ForceMode2D.Impulse);
 
 			if (!doubleJump && !grounded)
 			{doubleJump=true;}
@@ -37,6 +46,18 @@ public class Player : MonoBehaviour {
 	{
 
 		grounded = Physics2D.OverlapCircle (groundCheck.position, groundRadius, whatIsGround);
+		ancientwalled= walled;
+		if (!grounded) {
+						walled = Physics2D.OverlapCircle (wallCheck.position, wallRadius, whatIsWall);
+						if (walled) {
+								doubleJump = false;
+				if(!ancientwalled){
+					Flip();
+				}
+						}
+		} else {walled=false;
+				}
+		anim.SetBool ("walled", walled);
 		anim.SetBool("ground", grounded);
 
 		anim.SetFloat ("vSpeed", rigidbody2D.velocity.y);
@@ -47,7 +68,16 @@ public class Player : MonoBehaviour {
 		// if (!grounded) return; // non maniabilité du joueur en air  
 
 		float move = Input.GetAxis ("Horizontal");
-
+		if (move <= -0.5) {
+						move = -0.5f;
+				} else if (move > -0.5f && move <= -0.1f) {
+						move = -0.2f;
+				} else if (move > -0.1f && move <= 0.1f) {
+						move = 0f;
+				} else if (move > 0.1f && move <= 0.5f) {
+						move = 0.2f;
+		} else {move=0.5f;
+				}
 		anim.SetFloat("speed", Mathf.Abs(move));
 		// "Opérateur ternaire"(cf.google pour le terme):a partie du code : doubleJumpe?0.4f:1) est équivalente à : if(doubleJump){valeur=0.4}else{valeur=1} et valeur est injectée directement dans le code 
 
@@ -57,6 +87,7 @@ public class Player : MonoBehaviour {
 						Flip ();
 				else if (move < 0 && facingRight)
 						Flip ();
+
 	}
 
 	void Flip()
