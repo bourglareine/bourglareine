@@ -49,7 +49,7 @@ public class Player : MonoBehaviour
 				//Gestion des sauts
 				isJumpPressed = Input.GetKeyDown (KeyCode.Space) || Input.GetKeyDown (KeyCode.JoystickButton0);
 				//Appui sur le bouton saut.
-				if ((grounded || !doubleJump || walled) && isJumpPressed) {
+				if (isJumpPressed) {
 						grounded = false;
 						//Gestion de saut mural
 						if (walled && move != 0) {
@@ -59,14 +59,12 @@ public class Player : MonoBehaviour
 								anim.SetBool ("walled", walled);
 								freezeHorizontalMovementAfterWallJump++;
 								Debug.Log ("move:" + rigidbody2D.velocity.x);
-						} else if (!walled) {
+						} else if (!walled && !doubleJump) {
 								//Gestion de saut non mural
 								rigidbody2D.velocity = new Vector2 (rigidbody2D.velocity.x, 0);
 								rigidbody2D.AddForce (new Vector2 (0, !grounded ? jumpForce / 1.5f : jumpForce), ForceMode2D.Impulse);
-								if (!doubleJump && !grounded) {
-										doubleJump = true;
-								}
-								freezeHorizontalMovementAfterWallJump = 0;
+								doubleJump = true;
+								Debug.Log ("saut non mural");
 						}
 				} else if (walled && ((leftwall && move < 0) || (!leftwall && move > 0))) {
 						//Amortissement de la chute
@@ -80,18 +78,19 @@ public class Player : MonoBehaviour
 		/// </summary>
 		void FixedUpdate ()
 		{
-				if (freezeHorizontalMovementAfterWallJump > 0 && freezeHorizontalMovementAfterWallJump < 48) {
-						freezeHorizontalMovementAfterWallJump++;
-						move = leftwall ? tresholdMove (Mathf.Abs (Input.GetAxis ("Horizontal"))) : tresholdMove (-Mathf.Abs (Input.GetAxis ("Horizontal")));
-				} else {
-						freezeHorizontalMovementAfterWallJump = 0;
-						move = tresholdMove (Input.GetAxis ("Horizontal"));
-				}
 				grounded = Physics2D.OverlapCircle (groundCheck.position, groundRadius, whatIsGround);
 				if (grounded) {
 						doubleJump = false;
 				}
-				rigidbody2D.velocity = new Vector2 (move * maxSpeed * (doubleJump ? 0.4f : 1), rigidbody2D.velocity.y);
+				if (freezeHorizontalMovementAfterWallJump > 0 && freezeHorizontalMovementAfterWallJump < 48) {
+						freezeHorizontalMovementAfterWallJump++;
+						move = leftwall ? 0.5f : -0.5f;
+						rigidbody2D.velocity = new Vector2 (move * maxSpeed, rigidbody2D.velocity.y);
+				} else {
+						freezeHorizontalMovementAfterWallJump = 0;
+						move = tresholdMove (Input.GetAxis ("Horizontal"));
+						rigidbody2D.velocity = new Vector2 (move * maxSpeed * (doubleJump ? 0.4f : 1), rigidbody2D.velocity.y);
+				}
 				updateFixedAnimations ();
 		}
 
@@ -162,6 +161,9 @@ public class Player : MonoBehaviour
 						if (_wallcollider2d) {
 								leftwall = (_wallcollider2d.bounds.center.x - transform.position.x) < 0;
 								walled = (leftwall && move < 0) || (!leftwall && move > 0);
+
+								//Todo limits of the edges
+								//walled = walled && (_wallcollider2d.bounds.center.y - _wallcollider2d.bounds.extents.y - transform.collider2D.bounds.center.y + transform.collider2D.bounds.extents.y < 0);
 								if (walled && !ancientwalled && ((leftwall && !facingRight) || (!leftwall && facingRight))) {
 										Flip ();
 								}
@@ -170,5 +172,9 @@ public class Player : MonoBehaviour
 						walled = false;
 				}
 				return walled;
+		}
+		void OnCollisionEnter2D (Collision2D coll)
+		{
+				freezeHorizontalMovementAfterWallJump = 0;
 		}
 }
