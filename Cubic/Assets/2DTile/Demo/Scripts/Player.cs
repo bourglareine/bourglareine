@@ -1,27 +1,29 @@
-	using UnityEngine;      
+		using UnityEngine;
 using System.Collections;
 
 public class Player : MonoBehaviour
 {
-		private float move ;
+		private float move;
 
 		public float maxSpeed = 20f;
 		bool facingRight = true;
 		public float jumpForce = 700;
 		bool doubleJump = false;
+		bool buttonJumpReleased = false;
 
 		public Transform groundCheck;
 		public LayerMask whatIsGround;
 		bool grounded = false;
 		float groundRadius = 0.2f;
-				
+
 		public Transform wallCheck;
 		public LayerMask whatIsWall;
 		bool walled = false;
 		bool ancientwalled;
 		float wallRadius = 0.52f;
 		Collider2D _wallcollider2d;
-		bool leftwall;
+		bool nearWall = false;
+		bool? leftwall;
 		//Nombre de frames à pendant laquelles le déplacement horizontal dépends de la direction du saut mural
 		//Quand la variable=0/24 -> Inactif / Quand la variable entre 0 et 24 (1secondes)-> Gestion auto
 		int freezeHorizontalMovementAfterWallJump = 0;
@@ -41,36 +43,47 @@ public class Player : MonoBehaviour
 		/// </summary>
 		void Update ()
 		{
-				walled = isWalled (walled);
-				if (!walled) {
-						if ((move > 0 && !facingRight) || (move < 0 && facingRight)) 
+				nearWall = nearWalled ();
+				ancientwalled = walled;
+				walled = ((leftwall.HasValue && leftwall.Value && Input.GetAxis ("Horizontal") < 0) || (leftwall.HasValue && !leftwall.Value && Input.GetAxis ("Horizontal") > 0)) && (nearWall);
+				
+				Debug.Log ("nearwall:" + nearWall + " walled:" + walled);
+				if (!nearWall) {
+						if ((move > 0 && !facingRight) || (move < 0 && facingRight))
+								Flip ();
+				} else {
+						if (!ancientwalled && walled)
 								Flip ();
 				}
 				//Gestion des sauts
 				isJumpPressed = Input.GetKeyDown (KeyCode.Space) || Input.GetKeyDown (KeyCode.JoystickButton0);
-				//Appui sur le bouton saut.
-				if (isJumpPressed) {
-						grounded = false;
-						//Gestion de saut mural
-						if (walled && move != 0) {
-								rigidbody2D.velocity = new Vector2 (leftwall ? 10f : -10f, 4f);
-								rigidbody2D.AddForce (new Vector2 (leftwall ? 5 : -5f, jumpForce), ForceMode2D.Force);
-								walled = false;
+				if (isJumpPressed && buttonJumpReleased) {
+						if (nearWall) {
+								//Gestion de saut mural
+								rigidbody2D.velocity = new Vector2 (leftwall.Value == true ? 10f : -10f, 4f);
+								rigidbody2D.AddForce (new Vector2 (leftwall.Value == true ? 5f : -5f, jumpForce * 3.0f), ForceMode2D.Force);
+								walled = true;
+								Flip ();
 								anim.SetBool ("walled", walled);
+								walled = false;
 								freezeHorizontalMovementAfterWallJump++;
-								Debug.Log ("move:" + rigidbody2D.velocity.x);
-						} else if (!walled && !doubleJump) {
+								Debug.Log ("saut mural");
+								return;
+						} else if (!doubleJump) {
 								//Gestion de saut non mural
 								rigidbody2D.velocity = new Vector2 (rigidbody2D.velocity.x, 0);
 								rigidbody2D.AddForce (new Vector2 (0, !grounded ? jumpForce / 1.5f : jumpForce), ForceMode2D.Impulse);
 								doubleJump = true;
 								Debug.Log ("saut non mural");
 						}
-				} else if (walled && ((leftwall && move < 0) || (!leftwall && move > 0))) {
-						//Amortissement de la chute
-						rigidbody2D.velocity = new Vector2 (rigidbody2D.velocity.x, rigidbody2D.velocity.y / 1.5f);
+						buttonJumpReleased = false;
+				} else {
+						if (walled) {
+								rigidbody2D.velocity = new Vector2 (rigidbody2D.velocity.x, rigidbody2D.velocity.y / 1.5f);
+						}
+						buttonJumpReleased = true;
 				}
-				updateAnimations (walled, grounded);
+				updateAnimations (false, grounded);
 		}
 
 		/// <summary>
@@ -84,14 +97,21 @@ public class Player : MonoBehaviour
 				}
 				if (freezeHorizontalMovementAfterWallJump > 0 && freezeHorizontalMovementAfterWallJump < 48) {
 						freezeHorizontalMovementAfterWallJump++;
-						move = leftwall ? 0.5f : -0.5f;
+						if (leftwall.HasValue)
+								move = leftwall.Value == true ? 0.5f : -0.5f;
+						leftwall = null;
 						rigidbody2D.velocity = new Vector2 (move * maxSpeed, rigidbody2D.velocity.y);
 				} else {
 						freezeHorizontalMovementAfterWallJump = 0;
 						move = tresholdMove (Input.GetAxis ("Horizontal"));
+						if (move != 0) {
+								string lo = "l";
+								lo.Clone ();
+						}
 						rigidbody2D.velocity = new Vector2 (move * maxSpeed * (doubleJump ? 0.4f : 1), rigidbody2D.velocity.y);
 				}
 				updateFixedAnimations ();
+				updateAnimations (walled, grounded);
 		}
 
 		/// <summary>
@@ -153,28 +173,27 @@ public class Player : MonoBehaviour
 		/// </summary>
 		/// <returns><c>true</c>, if walled was used, <c>false</c> otherwise.</returns>
 		/// <param name="walled">If set to <c>true</c> walled.</param>
-		private bool isWalled (bool walled)
+		private bool nearWalled ()
 		{
-				bool ancientwalled = walled;
+				bool isnearwall = false;
 				if (!grounded) {
 						_wallcollider2d = Physics2D.OverlapCircle (wallCheck.position, wallRadius, whatIsWall);
 						if (_wallcollider2d) {
 								leftwall = (_wallcollider2d.bounds.center.x - transform.position.x) < 0;
-								walled = (leftwall && move < 0) || (!leftwall && move > 0);
-
-								//Todo limits of the edges
-								//walled = walled && (_wallcollider2d.bounds.center.y - _wallcollider2d.bounds.extents.y - transform.collider2D.bounds.center.y + transform.collider2D.bounds.extents.y < 0);
-								if (walled && !ancientwalled && ((leftwall && !facingRight) || (!leftwall && facingRight))) {
-										Flip ();
-								}
-						}
-				} else {
-						walled = false;
+								//Limits of the edges
+								float yOffset = _wallcollider2d.bounds.size.y / 2 - this.collider2D.bounds.size.y / 2;
+								//Debug.Log((_wallcollider2d.gameObject.transform.position.y - transform.position.y <= yOffset).ToString());
+								isnearwall = (_wallcollider2d.gameObject.transform.position.y - transform.position.y <= yOffset);
+						} 
 				}
-				return walled;
+				return isnearwall;
 		}
+
 		void OnCollisionEnter2D (Collision2D coll)
 		{
+				if (freezeHorizontalMovementAfterWallJump > 0) {
+						move = 0f;
+				}
 				freezeHorizontalMovementAfterWallJump = 0;
 		}
 }
