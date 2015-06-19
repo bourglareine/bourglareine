@@ -1,5 +1,6 @@
 		using UnityEngine;
 using System.Collections;
+using UnityEngine.Advertisements;
 
 public class Player : MonoBehaviour
 {
@@ -36,6 +37,10 @@ public class Player : MonoBehaviour
 		void Start ()
 		{
 				anim = GetComponent<Animator> ();
+				Advertisement.Initialize ("34788");
+				if (Advertisement.isReady ()) {
+						Advertisement.Show ();
+				}
 		}
 
 		/// <summary>
@@ -78,6 +83,9 @@ public class Player : MonoBehaviour
 						}
 						buttonJumpReleased = false;
 				} else {
+						if (Input.GetKeyDown (KeyCode.X) && !grounded) {
+								rigidbody2D.velocity = new Vector2 (0, -5f);
+						}
 						if (walled) {
 								rigidbody2D.velocity = new Vector2 (rigidbody2D.velocity.x, rigidbody2D.velocity.y / 1.5f);
 						}

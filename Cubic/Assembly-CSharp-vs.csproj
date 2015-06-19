@@ -50,7 +50,12 @@
      <Compile Include="Assets\2DTile\Demo\Scripts\Player.cs" />
      <Compile Include="Assets\2DTile\Scripts\TileLayer.cs" />
      <Compile Include="Assets\2DTile\Scripts\TileMarker.cs" />
+     <None Include="Assets\Plugins\Android\unityads\proguard-project.txt" />
+     <None Include="Assets\Plugins\Android\unityads\build.xml" />
+     <None Include="Assets\Standard Assets\Skyboxes\_skybox info.txt" />
      <None Include="Assets\2DTile\Shaders\2DTile.shader" />
+     <None Include="Assets\Plugins\Android\unityads\res\values\strings.xml" />
+     <None Include="Assets\Plugins\Android\unityads\AndroidManifest.xml" />
  <Reference Include="Assembly-UnityScript-firstpass">
  <HintPath>C:/Users/nabil/Documents/GitHub/bourglareine/Cubic/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
  </Reference>
