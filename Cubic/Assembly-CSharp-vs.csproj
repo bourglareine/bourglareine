@@ -50,6 +50,11 @@
      <Compile Include="Assets\2DTile\Demo\Scripts\Player.cs" />
      <Compile Include="Assets\2DTile\Scripts\TileLayer.cs" />
      <Compile Include="Assets\2DTile\Scripts\TileMarker.cs" />
+     <Compile Include="Assets\SaveLoad\Character.cs" />
+     <Compile Include="Assets\SaveLoad\Game.cs" />
+     <Compile Include="Assets\SaveLoad\Gameplay.cs" />
+     <Compile Include="Assets\SaveLoad\MainMenu.cs" />
+     <Compile Include="Assets\SaveLoad\SaveLoad.cs" />
      <None Include="Assets\Plugins\Android\unityads\proguard-project.txt" />
      <None Include="Assets\Plugins\Android\unityads\build.xml" />
      <None Include="Assets\Standard Assets\Skyboxes\_skybox info.txt" />

@@ -48,6 +48,10 @@ public class Player : MonoBehaviour
 		/// </summary>
 		void Update ()
 		{
+				if (Input.GetKeyDown (KeyCode.M)) {
+						SaveLoad.Save (0);
+				}
+
 				nearWall = nearWalled ();
 				ancientwalled = walled;
 				walled = ((leftwall.HasValue && leftwall.Value && Input.GetAxis ("Horizontal") < 0) || (leftwall.HasValue && !leftwall.Value && Input.GetAxis ("Horizontal") > 0)) && (nearWall);

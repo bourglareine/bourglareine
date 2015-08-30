@@ -9,7 +9,19 @@ public class MenuScript : MonoBehaviour
 	
 		public void LoadScene (string target)
 		{
+				switch (target) {
+				case "Quit":
+						Application.Quit ();
+						break;
+				case "Option":
+						break;
+				case "LoadGame":
+						SaveLoad.Load (0);
+						break;
+				default:
+						Application.LoadLevel (target);
+						break;
+				}
 				//loadingImage.SetActive (true);
-				Application.LoadLevel (target);
 		}
 }

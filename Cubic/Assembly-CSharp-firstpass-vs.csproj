@@ -48,6 +48,9 @@
   <ItemGroup>
      <Compile Include="Assets\Standard Assets\Menus\ButtonCreator.cs" />
      <Compile Include="Assets\Standard Assets\Menus\MenuScript.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\General Gaming\Character.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\General Gaming\Game.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\General Gaming\SaveLoad.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\General Scripts\ActivateTrigger.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\IA and Movements\PlayerScript.cs" />
      <Compile Include="Assets\Standard Assets\UnityAds\Scripts\Advertisement.cs" />
